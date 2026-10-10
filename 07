@@ -1,0 +1,32 @@
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+int main()
+{
+    char text[1000];
+    int i;
+
+    printf("Enter ciphertext:\n");
+    fgets(text, sizeof(text), stdin);
+
+    printf("\nDecrypted text:\n");
+
+    for (i = 0; text[i] != '\0'; i++)
+    {
+        if (isupper((unsigned char)text[i]))
+        {
+            printf("%c", 'Z' - (text[i] - 'A'));
+        }
+        else if (islower((unsigned char)text[i]))
+        {
+            printf("%c", 'z' - (text[i] - 'a'));
+        }
+        else
+        {
+            printf("%c", text[i]);
+        }
+    }
+
+    return 0;
+}
