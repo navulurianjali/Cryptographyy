@@ -1,0 +1,106 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int gcd(int a, int b)
+{
+    while (b != 0)
+    {
+        int t = b;
+        b = a % b;
+        a = t;
+    }
+
+    return a;
+}
+
+int modInverse(int a)
+{
+    int i;
+
+    for (i = 1; i < 26; i++)
+    {
+        if ((a * i) % 26 == 1)
+            return i;
+    }
+
+    return -1;
+}
+
+int main()
+{
+    char text[500];
+    int freq[26] = {0};
+    int i, a, b, inv, p;
+    int max1 = 0, max2 = 1;
+
+    printf("Enter affine ciphertext: ");
+    fgets(text, sizeof(text), stdin);
+
+    for (i = 0; text[i] != '\0'; i++)
+    {
+        if (isalpha((unsigned char)text[i]))
+            freq[toupper((unsigned char)text[i]) - 'A']++;
+    }
+
+    for (i = 0; i < 26; i++)
+    {
+        if (freq[i] > freq[max1])
+        {
+            max1 = i;
+        }
+    }
+
+    for (i = 0; i < 26; i++)
+    {
+        if (i != max1 && freq[i] > freq[max2])
+            max2 = i;
+    }
+
+    printf("\nMost frequent ciphertext letter: %c\n", max1 + 'A');
+    printf("Second frequent letter: %c\n", max2 + 'A');
+
+    printf("\nPossible plaintexts:\n");
+
+    /*
+       Try all valid affine keys.
+       English E and T are assumed as possible
+       mappings for the two frequent ciphertext letters.
+    */
+
+    for (a = 1; a < 26; a++)
+    {
+        if (gcd(a, 26) != 1)
+            continue;
+
+        inv = modInverse(a);
+
+        for (b = 0; b < 26; b++)
+        {
+            /* Decrypt the ciphertext */
+            printf("\na=%d, b=%d: ", a, b);
+
+            for (i = 0; text[i] != '\0'; i++)
+            {
+                if (isalpha((unsigned char)text[i]))
+                {
+                    int c = toupper((unsigned char)text[i]) - 'A';
+                    p = (inv * (c - b + 26)) % 26;
+
+                    if (islower((unsigned char)text[i]))
+                        printf("%c", p + 'a');
+                    else
+                        printf("%c", p + 'A');
+                }
+                else
+                {
+                    printf("%c", text[i]);
+                }
+            }
+
+            printf("\n");
+        }
+    }
+
+    return 0;
+}
